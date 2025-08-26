@@ -1,0 +1,22 @@
+# FastAPI and ASGI server
+fastapi==0.116.1
+uvicorn==0.35.0
+
+# HTTP client for Node-RED communication
+httpx==0.28.1
+
+# HTTP client for flow importer (required for auto-import)
+aiohttp==3.10.11
+
+# Additional FastAPI dependencies (automatically installed with FastAPI)
+starlette>=0.40.0
+pydantic>=2.0.0
+
+# Development and testing (optional)
+# pytest==7.4.4
+# pytest-asyncio==0.24.0
+# black==24.1.0
+# flake8==7.0.0
+
+# Environment variables (optional)
+# python-dotenv==1.0.1

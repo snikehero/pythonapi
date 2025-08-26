@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  # Python FastAPI service
+  python-api:
+    build: .
+    container_name: python-api
+    ports:
+      - "8000:8000"
+    environment:
+      - NODE_RED_URL=http://node-red:1880
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+      - DEBUG=true
+      - LOG_LEVEL=INFO
+    depends_on:
+      - node-red
+      - flow-importer
+    networks:
+      - backend-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Node-RED service
+  node-red:
+    image: nodered/node-red:latest
+    container_name: node-red
+    ports:
+      - "1880:1880"
+    volumes:
+      - node-red-data:/data
+    environment:
+      - TZ=UTC
+    networks:
+      - backend-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:1880/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Flow importer service (runs once to import flows)
+  flow-importer:
+    build: .
+    container_name: flow-importer
+    environment:
+      - NODE_RED_URL=http://node-red:1880
+    volumes:
+      - ./flows.json:/app/flows.json:ro
+      - ./auto-import-flows.py:/app/auto-import-flows.py:ro
+    command: ["python", "auto-import-flows.py"]
+    depends_on:
+      - node-red
+    networks:
+      - backend-network
+    restart: "no"
+    # This service runs once and exits
+
+networks:
+  backend-network:
+    driver: bridge
+
+volumes:
+  node-red-data:
