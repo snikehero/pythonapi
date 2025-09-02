@@ -3,28 +3,22 @@ from typing import Optional
 
 class Settings:
     """Application settings and configuration"""
-    
     # Node-RED Configuration
     NODE_RED_BASE_URL: str = os.getenv("NODE_RED_URL", "http://localhost:1880")
     NODE_RED_TIMEOUT: int = int(os.getenv("NODE_RED_TIMEOUT", "30"))  # seconds
-    
     # API Configuration
     API_HOST: str = os.getenv("API_HOST", "0.0.0.0")
     API_PORT: int = int(os.getenv("API_PORT", "8000"))
-    
     # CORS Settings
     ALLOWED_ORIGINS: list = [
         "http://localhost:3000",
         "http://127.0.0.1:3000",
         "http://localhost:3001",  # Alternative React port
     ]
-    
     # Logging
     LOG_LEVEL: str = os.getenv("LOG_LEVEL", "INFO")
-    
     # Development mode
     DEBUG: bool = os.getenv("DEBUG", "true").lower() == "true"
-    
     def __init__(self):
         """Initialize settings and validate configuration"""
         self.validate_config()

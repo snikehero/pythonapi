@@ -3,6 +3,7 @@ import logging
 from typing import Dict, Any, Optional
 import json
 from config import settings
+import tinytuya
 
 logger = logging.getLogger(__name__)
 
@@ -243,3 +244,51 @@ def format_node_red_response(data: Any, endpoint: str) -> Dict[str, Any]:
         "endpoint": endpoint,
         "timestamp": "2025-08-26T00:42:45Z"
     }
+
+class TuyaBulb:
+    def __init__(self, dev_id: str, ip: str, local_key: str, version: float = 3.5):
+        if not dev_id or not local_key or not ip:
+            raise ValueError("Faltan credenciales/configuración de Tuya (TUYA_DEVICE_ID, TUYA_LOCAL_KEY, TUYA_IP).")
+        self.device = tinytuya.BulbDevice(
+            dev_id=dev_id,
+            address=ip,
+            local_key=local_key,
+            version=version,
+        )
+        self.device.set_socketPersistent(True)
+
+    def connect(self) -> None:
+        self.device.set_mode("colour")
+        self.device.turn_on()
+
+    def color_rgb(self, r: int, g: int, b: int) -> None:
+        self.device.set_colour(r, g, b)
+
+    def negro(self) -> None:
+        self.color_rgb(0, 0, 0)
+
+    def rojo(self) -> None:
+        self.color_rgb(255, 0, 0)
+
+    def verde(self) -> None:
+        self.color_rgb(0, 255, 0)
+
+    def azul(self) -> None:
+        self.color_rgb(0, 0, 255)
+
+    def blanco(self) -> None:
+        self.color_rgb(255, 255, 255)
+
+    def on(self) -> None:
+        self.device.turn_on()
+
+    def off(self) -> None:
+        self.device.turn_off()
+
+    def blink(self, set_color_fn, hold_seconds: float = 2) -> None:
+        try:
+            self.on()
+            set_color_fn()
+            time.sleep(hold_seconds)
+        finally:
+            self.negro()

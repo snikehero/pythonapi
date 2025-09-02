@@ -28,7 +28,8 @@ services:
 
   # Node-RED service
   node-red:
-    image: nodered/node-red:latest
+    build: ./nodered 
+    #image: nodered/node-red:latest
     container_name: node-red
     ports:
       - "1880:1880"
